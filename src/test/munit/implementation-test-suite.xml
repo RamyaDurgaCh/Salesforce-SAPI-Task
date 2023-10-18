@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="implementation-test-suite.xml" >
+		<munit:parameterizations file="config\health-test-cases.yaml" />
+	</munit:config>
+	<munit:test name="implementation-test-suite-healthCheckFlowTest" doc:id="3c43920b-63ac-4e54-bd2f-2457a3c54564" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="SalesForce-Query" doc:id="ba7d5264-8167-4654-9383-f98663bd38ff" processor="salesforce:get-server-timestamp">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Get server timestamp" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="8bf4372e-fea0-4373-9f76-1c5ae4b314a0" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="${mock-sf-error}" />
+					<munit-tools:variables >
+						<munit-tools:variable key="result" value="#[output application/json --- MunitTools::getResourceAsString(p('mock-sf-connection-based-on-result-variable'))]" mediaType="application/json" encoding="UTF-8" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to healthCheckFlow" doc:id="27ed1be4-550f-4d84-a671-24cd7fda98e5" name="healthCheckFlow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="VerifycallTo-On-Error-Continue-SetVariable" doc:id="bcb62e38-7de7-431b-9c54-63fe882f614d" processor="set-variable" atLeast="#[p('verify-on-error-calls') as Number]">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="result" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="61bb21e6-c3e9-4c22-855c-bbf3c917600b" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+			<munit-tools:assert-equals doc:name="Assert equals" doc:id="ab1f072b-fbb6-4d1f-a8ce-938659e8b060" actual="#[payload.Status]" expected="#[p('assert-payload-status')]" message="Not Runnig as expected"/>
+		
+</munit:validation>
+	</munit:test>
+
+
+</mule>

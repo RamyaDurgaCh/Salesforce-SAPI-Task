@@ -1,0 +1,29 @@
+#%RAML 1.0
+title: salesforce-sapi
+description: This API Specification is designed for the team who wants to consume a custom object in Salesforce called Organization.This is a System API which will fetch the details from salesforce custom object and presents it to the user.
+baseUri: /api/{version}
+version: v1
+protocols: [HTTP,HTTPS]
+mediaType: [application/json]
+
+types:
+  Organization: !include dataTypes/organizationDataType.raml
+  healthCheck: !include dataTypes/healthCheckDataType.raml
+
+/health:
+  get:
+    responses:
+      200:
+        body:
+          type: healthCheck
+          
+            
+
+/organizations:
+  get:
+    description: to retrive data from organization custom object in salesforce
+    responses:
+      200:
+        body:
+          type: Organization
+          
