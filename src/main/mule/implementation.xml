@@ -7,7 +7,7 @@ http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mu
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 	<flow name="healthCheckFlow" doc:id="7670b263-d35c-44c7-8e51-e6877e4b4bfa" >
-		<logger level="INFO" doc:name="Logger" doc:id="445de081-c972-42d5-8e1f-de8516f81482" />
+		<logger level="INFO" doc:name="Logger" doc:id="445de081-c972-42d5-8e1f-de8516f81482" message="Health Flow starting logger"/>
 		<try doc:name="Try" doc:id="9a77a15f-eb25-4d4d-8a5c-c9d74d300100" >
 			<salesforce:get-server-timestamp doc:name="Get server timestamp" doc:id="8bf4372e-fea0-4373-9f76-1c5ae4b314a0" config-ref="Salesforce_Config" target="result" />
 			<error-handler >
@@ -28,43 +28,33 @@ output application/json
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<logger level="INFO" doc:name="Logger" doc:id="7a6c61d4-bb16-4924-84d9-0f0e0469ee45" />
+		<logger level="INFO" doc:name="Logger" doc:id="7a6c61d4-bb16-4924-84d9-0f0e0469ee45" message="Health flow ending logger"/>
 	</flow>
 	<flow name="getOrganizationDetails" doc:id="bb529963-ced5-4686-a455-99173898a12c" >
-		<logger level="INFO" doc:name="Logger" doc:id="66ac1a38-34f6-4d8a-a987-bc9763b60041" />
-		<try doc:name="Try" doc:id="322c96da-46cc-4f21-8edc-dcae87ea50a9" >
-			<salesforce:query doc:name="Query" doc:id="24a24831-e0c3-4b79-a970-9fa249ba1084" config-ref="Salesforce_Config" readTimeoutUnit="MILLISECONDS">
+		<logger level="INFO" doc:name="Logger" doc:id="66ac1a38-34f6-4d8a-a987-bc9763b60041" message="Start logger"/>
+		<salesforce:query doc:name="Query" doc:id="24a24831-e0c3-4b79-a970-9fa249ba1084" config-ref="Salesforce_Config" readTimeoutUnit="MILLISECONDS">
 			<salesforce:salesforce-query><![CDATA[select Name,Address__c,City__c,State__c,Zip__c,PhoneNumber__c,Revenue__c from Organization__c]]></salesforce:salesforce-query>
 		</salesforce:query>
-		</try>
-		<ee:transform doc:name="Transform Message" doc:id="416d6644-169f-4df7-ac31-630a15a19b68" >
+		<ee:transform doc:name="Transform to json" doc:id="416d6644-169f-4df7-ac31-630a15a19b68" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
----	
-payload
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	"Organization Name": payload01.Name default "",
+	Address: payload01.Address__c default "",
+	City: payload01.City__c default "",
+	State: payload01.State__c default "",
+	Zip: payload01.Zip__c default "",
+	PhoneNumber: payload01.PhoneNumber__c as String default "",
+	Revenue: payload01.Revenue__c default 0
+}]]></ee:set-payload>
 
-
-	
-	]]></ee:set-payload>
 			</ee:message>
-		</ee:transform>
-		<logger level="INFO" doc:name="Logger" doc:id="938f389b-f6a7-4dcc-b58b-eaf7b589a4ce" />
+			<ee:variables >
+			</ee:variables>
+		
+</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="938f389b-f6a7-4dcc-b58b-eaf7b589a4ce" message="End Logger"/>
 	</flow>
-<!-- [STUDIO:"implementationFlow"]	<flow name="implementationFlow" doc:id="cefbb416-f7d2-4333-8416-e76f99119062" >
-		<http:listener doc:name="Listener" doc:id="95ccf22b-feed-449f-b455-0dd7ed6d21bd" config-ref="salesforce-sapi-httpListenerConfig" path="/testorgs"/>
-		<try doc:name="Try" doc:id="7c635dba-d847-4593-bb2b-42de2b021baf" >
-			<salesforce:query doc:name="Query" doc:id="7f310d12-eb82-4b05-8eb9-af9cc034fbf2" config-ref="Salesforce_Config">
-			<salesforce:salesforce-query><![CDATA[select Name,Address__c,City__c,State__c,Zip__c,PhoneNumber__c,Revenue__c from Organization__c&#93;&#93;></salesforce:salesforce-query>
-		</salesforce:query>
-		</try>
-		<ee:transform doc:name="Transform Message" doc:id="3c28252c-8aac-4924-b7a8-83c10f6224d8" >
-			<ee:message >
-				<ee:set-payload ><![CDATA[%dw 2.0
-output application/json
-&#45;&#45;-
-payload&#93;&#93;></ee:set-payload>
-			</ee:message>
-		</ee:transform>
-	</flow> [STUDIO] -->
 </mule>

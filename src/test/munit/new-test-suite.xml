@@ -18,7 +18,7 @@
 					<munit-tools:with-attribute whereValue="24a24831-e0c3-4b79-a970-9fa249ba1084" attributeName="doc:id" />
 				</munit-tools:with-attributes>
 				<munit-tools:then-return >
-					<munit-tools:payload value="#[MunitTools::getResourceAsString(p('mock-sf-connection'))]" mediaType="application/java" encoding="UTF-8" />
+					<munit-tools:payload value="#[read(MunitTools::getResourceAsString(p('mock-sf-connection')), &quot;application/json&quot;)]" mediaType="application/java" encoding="UTF-8" />
 					<munit-tools:error typeId="${mock-sf-error}" />
 				</munit-tools:then-return>
 			</munit-tools:mock-when>
@@ -33,6 +33,7 @@
 					<munit-tools:with-attribute whereValue="938f389b-f6a7-4dcc-b58b-eaf7b589a4ce" attributeName="doc:id" />
 				</munit-tools:with-attributes>
 			</munit-tools:verify-call>
+			<munit-tools:assert-equals doc:name="Assert equals" doc:id="47bd60a6-7d24-459b-8579-a96ad9cc67c3" actual="#[payload]" expected="#[readUrl(p('assert-payload'))]" message="Payload doesnot match with what was expected"/>
 		</munit:validation>
 	
 </munit:test>

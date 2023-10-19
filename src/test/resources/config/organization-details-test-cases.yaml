@@ -1,11 +1,14 @@
 should-return-payload-on-organization-details-success:
   mock-sf-connection: "mocks/sf-organization-details-vars-result-on-success.json"
   mock-sf-error: ""
+  assert-payload: "classpath://mocks/sf-organization-details-payload.json"
   
 
 should-return-error-on-organization-details-failure:
-  mock-sf-connection: ""
+  mock-sf-connection: "mocks/sf-organization-details-vars-result-on-success.json"
   mock-sf-error: "SALESFORCE:CONNECTIVITY"
+  assert-payload: ""
+ 
 
   
 
