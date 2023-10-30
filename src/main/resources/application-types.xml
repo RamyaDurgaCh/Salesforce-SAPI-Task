@@ -16,6 +16,10 @@ type sample_Organization_data = {|
 
 ]]></types:shape>
     </types:type>
+    <types:type name="jobIdStatus" format="java">
+      <types:shape format="raml"><![CDATA[#%RAML 1.0 DataType
+type: string]]></types:shape>
+    </types:type>
   </types:catalog>
   <types:enrichment select="#416d6644-169f-4df7-ac31-630a15a19b68">
     <types:processor-declaration>

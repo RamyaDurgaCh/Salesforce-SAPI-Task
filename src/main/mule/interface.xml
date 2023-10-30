@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
-    
-	<flow name="salesforce-sapi-main">
-        <http:listener config-ref="Domain_HTTP_Listener_Config" path="/api/*">
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd  http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
+    <flow name="salesforce-sapi-main">
+        <http:listener config-ref="Domain_HTTP_Listener_Config" path="/api/v1/sf/sapi/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
                 <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
             </http:response>
@@ -94,7 +93,7 @@ output application/json
         </error-handler>
     </flow>
     <flow name="salesforce-sapi-console">
-        <http:listener config-ref="Domain_HTTP_Listener_Config" path="/console/*">
+        <http:listener config-ref="Domain_HTTP_Listener_Config" path="/console/v1/sf/sapi/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
                 <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
             </http:response>
@@ -125,5 +124,34 @@ output application/json
     </flow>
     <flow name="get:\organizations:salesforce-sapi-config">
         <flow-ref doc:name="Flow Reference" doc:id="a89c42bd-75b1-4ada-ba12-0886de32898b" name="getOrganizationDetails" />
+    </flow>
+    <flow name="get:\jobs\(id)\failed-records:salesforce-sapi-config">
+        <ee:transform doc:name="vars.jobId">
+            <ee:variables>
+                <ee:set-variable variableName="jobId"><![CDATA[attributes.uriParams.'id']]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <flow-ref doc:name="Flow Reference" doc:id="59e6968e-d696-4adb-9586-3aa6c5ceeab4" name="get-failed-records-jobIdImplementationFlow" />
+    </flow>
+    <flow name="get:\jobs\(id)\status:salesforce-sapi-config">
+        <ee:transform doc:name="vars.jobId">
+            <ee:variables>
+                <ee:set-variable variableName="jobId"><![CDATA[attributes.uriParams.'id']]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <flow-ref doc:name="Flow Reference" doc:id="1761c358-c894-4cc0-8e68-2caba82b4f8e" name="get-jobId-statusImplementationFlow" />
+    </flow>
+    <flow name="post:\organizations:application\json:salesforce-sapi-config">
+        <flow-ref doc:name="Flow Reference" doc:id="36a2b5e0-788f-437d-9f65-2d0816462583" name="post-organizationsFlow" />
+        <ee:transform doc:name="Transform Message">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  Status: "Created"
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
     </flow>
 </mule>

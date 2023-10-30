@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="healthCheckFlow" doc:id="5b194d02-0d61-406f-ae3e-84e5238c133e" >
+		<logger level="INFO" doc:name="Logger" doc:id="9d462b32-5f17-43d7-9bf7-6f85815dd232" message="Health Flow starting logger" />
+		<try doc:name="Try" doc:id="db4b46f1-c4a5-420f-9461-a1ff666e3f6d" >
+			<salesforce:get-server-timestamp doc:name="Get server timestamp" doc:id="6163c2b8-57ea-4f65-800a-5e2f5e7ba4aa" config-ref="Salesforce_Config" target="result" />
+			<error-handler >
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="e9c31f6e-9c0a-4b90-a094-3ea43145f14f" type="ANY" >
+					<set-variable value='#[""]' doc:name="result" doc:id="b5346e13-3613-42fc-a840-9fc410edefd2" variableName="result" />
+				</on-error-continue>
+			</error-handler>
+		</try>
+		<ee:transform doc:name="Transform Message" doc:id="4cf1a154-4291-4e39-b054-c67d2974c0f8" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  Status: if(not isEmpty(vars.result) ) "running" else "not-running",
+  timeStamp: now(),
+  (error: "unable to connect to salesforce") if(isEmpty(vars.result)) 
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger1" doc:id="32e27a3e-1845-42c3-a2d4-a4bba86a221f" message="Health flow ending logger" />
+	</flow>
+</mule>

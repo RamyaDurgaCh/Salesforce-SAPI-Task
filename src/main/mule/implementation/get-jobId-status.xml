@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="get-jobId-statusImplementationFlow" doc:id="1a02172f-2bda-4cee-a57b-4bbf59224b3e" >
+		<logger level="INFO" doc:name="Logger" doc:id="bcc62d60-c08b-443d-92f4-3714e0747c21" message="triggering job status flow"/>
+<!-- [STUDIO:"vars.jobId"]		<salesforce:job-info doc:name="vars.jobId" doc:id="522a5a6c-77a5-458d-a7e4-fbd1f48bbae2" config-ref="Salesforce_Config" jobId="#[vars.jobId&#93;" contentType="JSON"/> [STUDIO] -->
+		<salesforce:get-job-state-bulk-api-v2 doc:name="Get job state bulk api v 2" doc:id="5f9390da-7ec4-4126-a748-82d21549c025" config-ref="Salesforce_Config" id="#[vars.jobId]"/>
+<ee:transform doc:name="Transform Message" doc:id="87f6093e-7b47-4443-ab60-b1dbc173576b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	state: payload.state,
+	jobId: payload.id
+	
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<!-- [STUDIO:"Response"]		<ee:transform doc:name="Response" doc:id="c9e3e326-e10e-4276-b93b-356d25c9a79f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+{
+	jobId: vars.jobId,
+	status: payload.state
+}&#93;&#93;></ee:set-payload>
+			</ee:message>
+		</ee:transform> [STUDIO] -->
+		<logger level="INFO" doc:name="Logger" doc:id="5be462c9-05b8-4409-a022-334287b7bde6" message="completed job status flow"/>
+	</flow>
+</mule>
