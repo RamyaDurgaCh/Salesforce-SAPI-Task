@@ -7,15 +7,21 @@ http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mu
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 	<flow name="get-failed-records-jobIdImplementationFlow" doc:id="d3f339f6-9bbd-4f7f-8664-644624a5804f" >
 		<logger level="INFO" doc:name="Logger" doc:id="b54de250-3f4e-4688-ba1d-9839582a1a78" />
-		<salesforce:retrieve-job-failed-results-bulk-v2 doc:name="Retrieve job failed results bulk v 2" doc:id="6c170a79-a4d1-4004-935f-f3297745a851" config-ref="Salesforce_Config" id="#[vars.jobId]"/>
+		<salesforce:retrieve-job-failed-results-bulk-v2 doc:name="GET /jobs/{id}/failed-records" doc:id="6c170a79-a4d1-4004-935f-f3297745a851" config-ref="Salesforce_Config" id="#[vars.jobId]"/>
 		<ee:transform doc:name="Transform Message" doc:id="8bc53359-d22e-4003-a66f-1d479ec2e121" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
 ---
-if (sizeOf(payload) >0) "Failed Records" else "No Failed Records as of now"]]></ee:set-payload>
+{
+"id": payload.id,
+"errorMessage": "Failed"
+}
+
+
+]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<logger level="INFO" doc:name="Logger" doc:id="95bbd324-d043-49ff-8ade-63113a9e7217" />
+		<logger level="INFO" doc:name="Logger" doc:id="95bbd324-d043-49ff-8ade-63113a9e7217" message="#[output application/json --- payload]"/>
 	</flow>
 </mule>

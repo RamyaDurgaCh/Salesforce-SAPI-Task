@@ -18,12 +18,24 @@ payload map ({
     "State__c": $.State,
     "Zip__c": $.Zip,
     "PhoneNumber__c": $.PhoneNumber,
-    "Revenue__c": $.Revenue   
+    "Revenue__c": $.Revenue
 })]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<salesforce:create-job-bulk-api-v2 doc:name="Create job bulk api v 2" doc:id="ca38f3de-0e21-4e41-839a-d10d248b3b9d" config-ref="Salesforce_Config" objectType="Organization__c" operation="insert" lineEnding="CRLF">
+		<salesforce:create-job-bulk-api-v2 doc:name="POST /organizations" doc:id="ca38f3de-0e21-4e41-839a-d10d248b3b9d" config-ref="Salesforce_Config" objectType="Organization__c" operation="insert" lineEnding="CRLF">
 		</salesforce:create-job-bulk-api-v2>
+		<ee:transform doc:name="Transform Message" doc:id="5411a213-cb15-4eeb-8607-ecbc224cee2d" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"createdId": payload.id,
+	"status": payload.state,
+	
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
 		<logger level="INFO" doc:name="Logger" doc:id="fd49da78-4687-481d-875d-a811e08dc4fc" message="#[output application/json --- payload]"/>
 	</flow>
 </mule>

@@ -8,7 +8,7 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 	<flow name="getOrganizationDetails" doc:id="bb529963-ced5-4686-a455-99173898a12c" >
 		<logger level="INFO" doc:name="Logger" doc:id="66ac1a38-34f6-4d8a-a987-bc9763b60041" message="Start logger"/>
-		<salesforce:query doc:name="Query" doc:id="24a24831-e0c3-4b79-a970-9fa249ba1084" config-ref="Salesforce_Config" readTimeoutUnit="MILLISECONDS">
+		<salesforce:query doc:name="GET /organizations" doc:id="24a24831-e0c3-4b79-a970-9fa249ba1084" config-ref="Salesforce_Config" readTimeoutUnit="MILLISECONDS">
 			<salesforce:salesforce-query><![CDATA[select Name,Address__c,City__c,State__c,Zip__c,PhoneNumber__c,Revenue__c from Organization__c]]></salesforce:salesforce-query>
 		</salesforce:query>
 		<ee:transform doc:name="Transform to json" doc:id="416d6644-169f-4df7-ac31-630a15a19b68" >
